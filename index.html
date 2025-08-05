@@ -1,0 +1,23 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tekno App | Giriş</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+    <div class="login-container">
+        <h1>Tekno App</h1>
+        <form method="POST">
+            <input type="text" name="email_or_phone" placeholder="E-posta veya Telefon" required />
+            <input type="password" name="password" placeholder="Şifre" required />
+            <button type="submit">Giriş Yap</button>
+        </form>
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+    </div>
+</body>
+</html>
