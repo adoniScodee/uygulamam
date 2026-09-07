@@ -1,23 +1,179 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tekno App | Giriş</title>
-    <link rel="stylesheet" href="/static/css/style.css" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#08090d">
+<title>TIRE FLICK — Tek Parmak Lastik Oyunu</title>
+<style>
+:root{
+  --bg:#07080c; --panel:rgba(14,16,23,.88); --line:rgba(255,255,255,.10);
+  --text:#f5f7fb; --muted:#89909e; --accent:#ff5b22; --accent2:#ffb13b;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;color:var(--text)}
+body{touch-action:none}
+#app{position:relative;width:100%;height:100%;overflow:hidden;background:
+ radial-gradient(circle at 50% 18%,rgba(255,91,34,.10),transparent 30%),
+ linear-gradient(180deg,#0a0b10 0%,#07080c 55%,#050609 100%)}
+canvas{position:absolute;inset:0;width:100%;height:100%}
+#intro{position:absolute;inset:0;display:grid;place-items:center;z-index:10;background:
+ radial-gradient(circle at 50% 45%,rgba(255,91,34,.18),transparent 26%),
+ linear-gradient(180deg,#06070b,#090a0f);transition:opacity .8s,visibility .8s}
+#intro.hide{opacity:0;visibility:hidden;pointer-events:none}
+.intro-inner{text-align:center;transform:translateY(-3vh);padding:20px}
+.logo{font-size:clamp(46px,12vw,108px);font-weight:950;letter-spacing:-.075em;line-height:.8;
+ text-shadow:0 0 35px rgba(255,91,34,.35);animation:logoIn 1s cubic-bezier(.2,.9,.2,1) both}
+.logo span{color:var(--accent)}
+.kicker{margin:20px 0 8px;font-size:12px;letter-spacing:.38em;text-transform:uppercase;color:#aeb4bf;animation:fadeUp .7s .25s both}
+.subtitle{font-size:clamp(15px,2.5vw,22px);font-weight:700;color:#e6e8ec;animation:fadeUp .7s .4s both}
+.tap{margin-top:36px;display:inline-flex;align-items:center;gap:10px;padding:14px 20px;border:1px solid var(--line);
+ border-radius:999px;background:rgba(255,255,255,.04);font-weight:800;font-size:13px;letter-spacing:.08em;
+ animation:pulse 1.5s 1s infinite,fadeUp .7s .55s both}
+.tap i{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 18px var(--accent)}
+@keyframes logoIn{from{opacity:0;transform:scale(.72) skewX(-8deg)}to{opacity:1;transform:none}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes pulse{50%{box-shadow:0 0 0 9px rgba(255,91,34,0)}from{box-shadow:0 0 0 0 rgba(255,91,34,.18)}}
+#hud{position:absolute;z-index:3;top:0;left:0;right:0;padding:max(18px,env(safe-area-inset-top)) 18px 0;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none}
+.brand{font-weight:950;letter-spacing:-.05em;font-size:19px}.brand b{color:var(--accent)}
+.stats{display:flex;gap:8px}.stat{min-width:76px;padding:8px 11px;border:1px solid var(--line);border-radius:13px;background:rgba(10,11,16,.62);backdrop-filter:blur(10px);text-align:right}
+.stat small{display:block;font-size:9px;color:var(--muted);letter-spacing:.13em;text-transform:uppercase}.stat strong{font-size:17px}
+#hint{position:absolute;z-index:2;left:50%;top:42%;transform:translate(-50%,-50%);text-align:center;color:#c8cdd5;pointer-events:none;transition:opacity .3s}
+#hint .finger{font-size:44px;filter:drop-shadow(0 8px 18px rgba(255,91,34,.25));animation:float 1.3s infinite}
+#hint p{margin:8px 0 0;font-weight:800;font-size:13px;letter-spacing:.06em}
+@keyframes float{50%{transform:translateY(-10px)}}
+#bottom{position:absolute;z-index:4;left:12px;right:12px;bottom:max(12px,env(safe-area-inset-bottom));padding:12px;
+ border:1px solid var(--line);border-radius:20px;background:var(--panel);backdrop-filter:blur(18px);display:flex;align-items:center;gap:12px}
+.tire-mini{width:42px;height:42px;border-radius:50%;border:7px solid #20232b;box-shadow:inset 0 0 0 2px #08090c;position:relative;flex:none}
+.tire-mini:after{content:"";position:absolute;inset:8px;border-radius:50%;border:2px solid #454a55}
+#power{flex:1}.bar{height:7px;background:#20232a;border-radius:10px;overflow:hidden}.fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:10px;box-shadow:0 0 16px rgba(255,91,34,.5)}
+#bottom button{border:0;border-radius:13px;background:#f3f4f6;color:#090a0d;padding:11px 14px;font-weight:900;cursor:pointer}
+#bottom button:active{transform:scale(.97)}
+#toast{position:absolute;z-index:5;top:78px;left:50%;transform:translateX(-50%) translateY(-8px);opacity:0;
+ padding:9px 14px;border-radius:999px;background:#f3f4f6;color:#090a0d;font-weight:950;font-size:12px;transition:.25s;pointer-events:none}
+#toast.show{opacity:1;transform:translateX(-50%)}
+</style>
 </head>
 <body>
-    <div class="login-container">
-        <h1>Tekno App</h1>
-        <form method="POST">
-            <input type="text" name="email_or_phone" placeholder="E-posta veya Telefon" required />
-            <input type="password" name="password" placeholder="Şifre" required />
-            <button type="submit">Giriş Yap</button>
-        </form>
-        {% if error %}
-            <p class="error">{{ error }}</p>
-        {% endif %}
-    </div>
+<div id="app">
+<canvas id="game"></canvas>
+
+<section id="intro">
+  <div class="intro-inner">
+    <div class="logo">TIRE<span>FLICK</span></div>
+    <div class="kicker">ONE FINGER / ONE SHOT</div>
+    <div class="subtitle">Lastiği fırlat. Hedefi vur. Rekoru kır.</div>
+    <div class="tap"><i></i>DOKUN VE BAŞLA</div>
+  </div>
+</section>
+
+<div id="hud">
+  <div class="brand">TIRE<b>FLICK</b></div>
+  <div class="stats">
+    <div class="stat"><small>Skor</small><strong id="score">0000</strong></div>
+    <div class="stat"><small>Combo</small><strong id="combo">x1</strong></div>
+  </div>
+</div>
+
+<div id="hint"><div class="finger">☝</div><p>LASTİĞİ GERİ ÇEK · BIRAK</p></div>
+<div id="toast">+100 PERFECT</div>
+
+<div id="bottom">
+  <div class="tire-mini"></div>
+  <div id="power"><div class="bar"><div class="fill" id="fill"></div></div></div>
+  <button id="reset">YENİ OYUN</button>
+</div>
+</div>
+
+<script>
+(() => {
+const c=document.getElementById('game'),ctx=c.getContext('2d');
+const intro=document.getElementById('intro'), hint=document.getElementById('hint');
+const scoreEl=document.getElementById('score'),comboEl=document.getElementById('combo');
+const fill=document.getElementById('fill'),toast=document.getElementById('toast');
+let W,H,DPR,score=0,combo=1,drag=false,aim={x:0,y:0},tire,targets=[],particles=[],last=performance.now(),introDone=false;
+
+function resize(){DPR=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;c.width=W*DPR;c.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);resetGame()}
+addEventListener('resize',resize);
+
+function resetGame(){
+ score=0;combo=1;updateHud();particles=[];
+ tire={x:W*.5,y:H*.64,vx:0,vy:0,r:Math.max(25,Math.min(38,W*.075)),flying:false,rot:0};
+ targets=[
+  {x:W*.5,y:H*.25,r:Math.min(42,W*.09),hit:false},
+  {x:W*.25,y:H*.36,r:Math.min(30,W*.065),hit:false},
+  {x:W*.75,y:H*.34,r:Math.min(34,W*.07),hit:false}
+ ];
+ fill.style.width='0%'; hint.style.opacity='1';
+}
+function updateHud(){scoreEl.textContent=String(score).padStart(4,'0');comboEl.textContent='x'+combo}
+function pos(e){const r=c.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
+function down(e){
+ if(!introDone){introDone=true;intro.classList.add('hide')}
+ const p=pos(e),d=Math.hypot(p.x-tire.x,p.y-tire.y);
+ if(!tire.flying && d<tire.r*2.2){drag=true;aim=p;e.preventDefault()}
+}
+function move(e){if(!drag)return;aim=pos(e);const dx=tire.x-aim.x,dy=tire.y-aim.y;const power=Math.min(1,Math.hypot(dx,dy)/(Math.min(W,H)*.42));fill.style.width=(power*100)+'%';e.preventDefault()}
+function up(e){
+ if(!drag)return;drag=false;const p=pos(e),dx=tire.x-p.x,dy=tire.y-p.y,len=Math.hypot(dx,dy);
+ if(len>12){const max=Math.min(W,H)*.025;tire.vx=(dx/len)*Math.min(len,max*18);tire.vy=(dy/len)*Math.min(len,max*18);tire.flying=true;hint.style.opacity='0';fill.style.width='0%'}
+ e.preventDefault()
+}
+c.addEventListener('pointerdown',down,{passive:false});c.addEventListener('pointermove',move,{passive:false});c.addEventListener('pointerup',up,{passive:false});c.addEventListener('pointercancel',up,{passive:false});
+document.getElementById('reset').onclick=resetGame;
+intro.addEventListener('pointerdown',()=>{introDone=true;intro.classList.add('hide')});
+
+function burst(x,y,n=18){
+ for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,s=2+Math.random()*6;particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l:1,r:1+Math.random()*3})}
+}
+function hitTarget(q){
+ q.hit=true;burst(q.x,q.y,28);score+=100*combo;combo=Math.min(9,combo+1);updateHud();
+ toast.textContent='+ '+(100*(combo-1))+'  PERFECT';toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),650);
+ setTimeout(()=>{q.x=40+Math.random()*(W-80);q.y=130+Math.random()*(H*.4);q.hit=false},500);
+}
+function drawTire(){
+ ctx.save();ctx.translate(tire.x,tire.y);ctx.rotate(tire.rot);
+ ctx.shadowColor='rgba(0,0,0,.65)';ctx.shadowBlur=25;ctx.shadowOffsetY=13;
+ ctx.beginPath();ctx.arc(0,0,tire.r,0,Math.PI*2);ctx.fillStyle='#15171d';ctx.fill();
+ ctx.shadowColor='transparent';ctx.lineWidth=Math.max(8,tire.r*.22);ctx.strokeStyle='#30343c';ctx.stroke();
+ ctx.lineWidth=2;ctx.strokeStyle='#08090c';ctx.beginPath();ctx.arc(0,0,tire.r*.62,0,Math.PI*2);ctx.stroke();
+ ctx.beginPath();ctx.arc(0,0,tire.r*.33,0,Math.PI*2);ctx.fillStyle='#08090c';ctx.fill();
+ for(let i=0;i<10;i++){const a=i*Math.PI*2/10;ctx.save();ctx.rotate(a);ctx.fillStyle='#3e434d';ctx.fillRect(-2,-tire.r*.84,4,tire.r*.15);ctx.restore()}
+ ctx.restore();
+}
+function drawTarget(q){
+ ctx.save();ctx.translate(q.x,q.y);
+ const pulse=1+Math.sin(performance.now()/500+q.x)*.04;
+ ctx.scale(pulse,pulse);ctx.shadowColor='rgba(255,91,34,.4)';ctx.shadowBlur=22;
+ ctx.beginPath();ctx.arc(0,0,q.r,0,Math.PI*2);ctx.fillStyle='rgba(255,91,34,.13)';ctx.fill();
+ ctx.shadowColor='transparent';ctx.lineWidth=3;ctx.strokeStyle='#ff5b22';ctx.stroke();
+ ctx.lineWidth=2;ctx.strokeStyle='rgba(255,255,255,.7)';ctx.beginPath();ctx.arc(0,0,q.r*.55,0,Math.PI*2);ctx.stroke();
+ ctx.restore();
+}
+function loop(now){
+ const dt=Math.min((now-last)/16.67,2);last=now;
+ ctx.clearRect(0,0,W,H);
+ // subtle floor grid
+ ctx.strokeStyle='rgba(255,255,255,.025)';ctx.lineWidth=1;
+ for(let x=0;x<W;x+=44){ctx.beginPath();ctx.moveTo(x,H*.54);ctx.lineTo(x,H);ctx.stroke()}
+ for(let y=H*.56;y<H;y+=44){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+ targets.forEach(drawTarget);
+ if(drag){
+   const dx=tire.x-aim.x,dy=tire.y-aim.y,len=Math.hypot(dx,dy),cap=Math.min(W,H)*.42,s=Math.min(len,cap)/len;
+   const ax=tire.x-dx*s,ay=tire.y-dy*s;
+   ctx.setLineDash([7,9]);ctx.lineWidth=2;ctx.strokeStyle='rgba(255,177,59,.65)';ctx.beginPath();ctx.moveTo(tire.x,tire.y);ctx.lineTo(ax,ay);ctx.stroke();ctx.setLineDash([]);
+ }
+ if(tire.flying){
+   tire.x+=tire.vx*dt;tire.y+=tire.vy*dt;tire.vy+=.24*dt;tire.vx*=.997;tire.vy*=.997;tire.rot+=.12*dt;
+   targets.forEach(q=>{if(!q.hit&&Math.hypot(tire.x-q.x,tire.y-q.y)<tire.r+q.r*.65)hitTarget(q)});
+   if(tire.x<-100||tire.x>W+100||tire.y<-100||tire.y>H+100||tire.y>H+80){tire.x=W*.5;tire.y=H*.64;tire.vx=tire.vy=0;tire.flying=false;combo=1;updateHud()}
+ }
+ particles.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=.12*dt;p.l-=.025*dt;ctx.globalAlpha=Math.max(0,p.l);ctx.fillStyle='#ff8a43';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill()});ctx.globalAlpha=1;
+ drawTire();
+ requestAnimationFrame(loop)
+}
+resize();requestAnimationFrame(loop);
+})();
+</script>
 </body>
 </html>
